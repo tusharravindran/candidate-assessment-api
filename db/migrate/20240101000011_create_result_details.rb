@@ -13,6 +13,5 @@ class CreateResultDetails < ActiveRecord::Migration[7.1]
       t.timestamps
     end
     add_index :result_details, [:result_id, :question_id]
-    add_index :result_details, :organization_id
   end
 end

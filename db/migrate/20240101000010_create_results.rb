@@ -1,7 +1,7 @@
 class CreateResults < ActiveRecord::Migration[7.1]
   def change
     create_table :results do |t|
-      t.references :candidate_session, null: false, foreign_key: true
+      t.references :candidate_session, null: false, foreign_key: true, index: false
       t.references :organization, null: false, foreign_key: true
       t.references :assessment, null: false, foreign_key: true
       t.integer :total_score, default: 0

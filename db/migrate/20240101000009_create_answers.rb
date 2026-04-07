@@ -9,6 +9,5 @@ class CreateAnswers < ActiveRecord::Migration[7.1]
       t.timestamps
     end
     add_index :answers, [:candidate_session_id, :question_id], unique: true
-    add_index :answers, :organization_id
   end
 end

@@ -1,0 +1,33 @@
+ENV["RAILS_ENV"] ||= "test"
+
+require File.expand_path("../config/environment", __dir__)
+abort("The Rails environment is running in production mode!") if Rails.env.production?
+
+require "rspec/rails"
+require "factory_bot_rails"
+require "active_job/test_helper"
+
+begin
+  ActiveRecord::Migration.maintain_test_schema!
+rescue ActiveRecord::PendingMigrationError => e
+  abort e.to_s.strip
+end
+
+Dir[Rails.root.join("spec/support/**/*.rb")].sort.each { |file| require file }
+
+RSpec.configure do |config|
+  config.fixture_path = Rails.root.join("spec/fixtures")
+  config.use_transactional_fixtures = true
+  config.infer_spec_type_from_file_location!
+  config.filter_rails_from_backtrace!
+
+  config.include FactoryBot::Syntax::Methods
+  config.include ActiveJob::TestHelper
+
+  config.before do
+    ActiveJob::Base.queue_adapter = :test
+    clear_enqueued_jobs
+    clear_performed_jobs
+    Current.reset
+  end
+end

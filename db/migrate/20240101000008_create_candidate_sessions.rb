@@ -1,7 +1,7 @@
 class CreateCandidateSessions < ActiveRecord::Migration[7.1]
   def change
     create_table :candidate_sessions do |t|
-      t.references :invitation, null: false, foreign_key: true
+      t.references :invitation, null: false, foreign_key: true, index: false
       t.references :organization, null: false, foreign_key: true
       t.references :assessment, null: false, foreign_key: true
       t.string :status, null: false, default: "not_started"

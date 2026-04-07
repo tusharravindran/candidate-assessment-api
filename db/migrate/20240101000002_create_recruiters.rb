@@ -19,6 +19,5 @@ class CreateRecruiters < ActiveRecord::Migration[7.1]
     end
     add_index :recruiters, :email, unique: true
     add_index :recruiters, :reset_password_token, unique: true
-    add_index :recruiters, :organization_id
   end
 end

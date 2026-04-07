@@ -10,6 +10,5 @@ class CreateQuestions < ActiveRecord::Migration[7.1]
       t.timestamps
     end
     add_index :questions, [:assessment_id, :position]
-    add_index :questions, :organization_id
   end
 end

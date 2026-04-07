@@ -1,6 +1,6 @@
 class AddOrganizationToQuestionOptions < ActiveRecord::Migration[7.1]
   def up
-    add_reference :question_options, :organization, foreign_key: true
+    add_reference :question_options, :organization, foreign_key: true, index: false
 
     execute <<~SQL.squish
       UPDATE question_options
