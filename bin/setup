@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+require "fileutils"
+
+APP_ROOT = File.expand_path("..", __dir__)
+
+Dir.chdir(APP_ROOT) do
+  puts "Installing gems..."
+  system("bundle check") || system("bundle install")
+
+  puts "Preparing database..."
+  system("bundle exec rails db:prepare")
+
+  puts "Creating Elasticsearch index..."
+  system(%q{bundle exec rails runner "Elasticsearch::CandidateResultIndexer.create_index!"})
+end

@@ -1,0 +1,1113 @@
+openapi: 3.0.3
+info:
+  title: Candidate Assessment API
+  version: 1.0.0
+  description: |
+    Multi-tenant candidate assessment backend for recruiter assessment authoring,
+    invitation delivery, candidate test sessions, asynchronous scoring, manual review,
+    dashboard analytics, and Elasticsearch-backed recruiter search.
+servers:
+  - url: http://localhost:3001/api/v1
+    description: Local development
+  - url: https://candidate-assessment-api.onrender.com/api/v1
+    description: Render deployment
+security:
+  - BearerAuth: []
+tags:
+  - name: Auth
+  - name: Organizations
+  - name: Assessments
+  - name: Questions
+  - name: Invitations
+  - name: Candidate Sessions
+  - name: Submissions
+  - name: Recruiter Dashboard
+  - name: Search
+  - name: Manual Review
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required: [error]
+    Pagination:
+      type: object
+      properties:
+        current_page:
+          type: integer
+        total_pages:
+          type: integer
+        total_count:
+          type: integer
+        per_page:
+          type: integer
+    Organization:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        plan:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    Recruiter:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+          enum: [member, admin]
+        organization:
+          $ref: "#/components/schemas/Organization"
+    QuestionOption:
+      type: object
+      properties:
+        id:
+          type: integer
+        body:
+          type: string
+        position:
+          type: integer
+        correct:
+          type: boolean
+    Question:
+      type: object
+      properties:
+        id:
+          type: integer
+        body:
+          type: string
+        question_type:
+          type: string
+          enum: [multiple_choice, true_false, free_text]
+        points:
+          type: integer
+        position:
+          type: integer
+        question_options:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuestionOption"
+    Assessment:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        time_limit_minutes:
+          type: integer
+        passing_score:
+          type: integer
+        status:
+          type: string
+          enum: [draft, published, archived]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Question"
+    Invitation:
+      type: object
+      properties:
+        id:
+          type: integer
+        candidate_email:
+          type: string
+          format: email
+        candidate_name:
+          type: string
+        token:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        used:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        assessment:
+          $ref: "#/components/schemas/Assessment"
+    CandidateSession:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+          enum: [not_started, in_progress, auto_submitted, submitted, expired]
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+        submitted_at:
+          type: string
+          format: date-time
+          nullable: true
+        deadline_at:
+          type: string
+          format: date-time
+          nullable: true
+        start_time:
+          type: string
+          format: date-time
+          nullable: true
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+        time_remaining_seconds:
+          type: integer
+        assessment:
+          $ref: "#/components/schemas/Assessment"
+        invitation:
+          type: object
+          properties:
+            candidate_email:
+              type: string
+            candidate_name:
+              type: string
+    ResultDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        candidate_answer:
+          type: string
+          nullable: true
+        expected_answer:
+          type: string
+          nullable: true
+        score_awarded:
+          type: integer
+        max_score:
+          type: integer
+        review_status:
+          type: string
+          enum: [not_required, pending_manual_review, reviewed]
+        reviewer_notes:
+          type: string
+          nullable: true
+        question:
+          type: object
+          properties:
+            id:
+              type: integer
+            body:
+              type: string
+            question_type:
+              type: string
+            points:
+              type: integer
+            position:
+              type: integer
+    Result:
+      type: object
+      properties:
+        id:
+          type: integer
+        total_score:
+          type: integer
+        max_score:
+          type: integer
+        percentage:
+          type: number
+          format: float
+        passed:
+          type: boolean
+        pass_fail:
+          type: string
+          enum: [pass, fail]
+        pending_manual_review:
+          type: boolean
+        status:
+          type: string
+          enum: [pending, finalized, pending_manual_review]
+        created_at:
+          type: string
+          format: date-time
+        result_details:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResultDetail"
+        candidate_session:
+          $ref: "#/components/schemas/CandidateSession"
+        invitation:
+          type: object
+          properties:
+            candidate_email:
+              type: string
+            candidate_name:
+              type: string
+            expires_at:
+              type: string
+              format: date-time
+        assessment:
+          $ref: "#/components/schemas/Assessment"
+    DashboardStats:
+      type: object
+      properties:
+        total_assessments:
+          type: integer
+        published_assessments:
+          type: integer
+        total_invitations:
+          type: integer
+        total_sessions:
+          type: integer
+        completed_sessions:
+          type: integer
+        completion_rate:
+          type: number
+          format: float
+        average_score:
+          type: number
+          format: float
+        pass_rate:
+          type: number
+          format: float
+        total_results:
+          type: integer
+        passed_results:
+          type: integer
+        pending_review:
+          type: integer
+    SearchFacetBucket:
+      type: object
+      properties:
+        key:
+          oneOf:
+            - type: string
+            - type: integer
+        count:
+          type: integer
+    SearchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+        total:
+          type: integer
+        page:
+          type: integer
+        per_page:
+          type: integer
+        facets:
+          type: object
+          properties:
+            pass_fail:
+              type: array
+              items:
+                $ref: "#/components/schemas/SearchFacetBucket"
+            assessments:
+              type: array
+              items:
+                $ref: "#/components/schemas/SearchFacetBucket"
+            completion_status:
+              type: array
+              items:
+                $ref: "#/components/schemas/SearchFacetBucket"
+    AssessmentInput:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        time_limit_minutes:
+          type: integer
+        passing_score:
+          type: integer
+      required: [title]
+    QuestionInput:
+      type: object
+      properties:
+        body:
+          type: string
+        question_type:
+          type: string
+          enum: [multiple_choice, true_false, free_text]
+        points:
+          type: integer
+        position:
+          type: integer
+        options:
+          type: array
+          items:
+            type: object
+            properties:
+              body:
+                type: string
+              correct:
+                type: boolean
+      required: [body, question_type]
+    InvitationInput:
+      type: object
+      properties:
+        candidate_email:
+          type: string
+          format: email
+        candidate_name:
+          type: string
+        assessment_id:
+          type: integer
+        expires_at:
+          type: string
+          format: date-time
+      required: [candidate_email, assessment_id]
+    AnswerInput:
+      type: object
+      properties:
+        question_id:
+          type: integer
+        selected_option_id:
+          type: integer
+          nullable: true
+        free_text_answer:
+          type: string
+          nullable: true
+      required: [question_id]
+    ManualReviewInput:
+      type: object
+      properties:
+        detail_id:
+          type: integer
+        score_awarded:
+          type: integer
+        reviewer_notes:
+          type: string
+      required: [detail_id, score_awarded]
+paths:
+  /health:
+    get:
+      tags: [Recruiter Dashboard]
+      security: []
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+  /auth/sign_up:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Register a recruiter and organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recruiter:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    email:
+                      type: string
+                      format: email
+                    password:
+                      type: string
+                    password_confirmation:
+                      type: string
+                organization_name:
+                  type: string
+              required: [recruiter]
+      responses:
+        "201":
+          description: Account created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recruiter:
+                    $ref: "#/components/schemas/Recruiter"
+                  message:
+                    type: string
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/sign_in:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Authenticate recruiter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recruiter:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                    password:
+                      type: string
+      responses:
+        "200":
+          description: Authenticated
+          headers:
+            Authorization:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recruiter:
+                    $ref: "#/components/schemas/Recruiter"
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/sign_out:
+    delete:
+      tags: [Auth]
+      summary: Revoke JWT
+      responses:
+        "200":
+          description: Signed out
+  /organization:
+    get:
+      tags: [Organizations]
+      summary: Show current tenant organization
+      responses:
+        "200":
+          description: Organization
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+    patch:
+      tags: [Organizations]
+      summary: Update organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                organization:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+  /assessments:
+    get:
+      tags: [Assessments]
+      summary: List assessments
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Assessment list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assessments:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Assessment"
+                  meta:
+                    $ref: "#/components/schemas/Pagination"
+    post:
+      tags: [Assessments]
+      summary: Create assessment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assessment:
+                  $ref: "#/components/schemas/AssessmentInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assessment"
+  /assessments/{id}:
+    get:
+      tags: [Assessments]
+      summary: Show assessment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Assessment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assessment"
+    patch:
+      tags: [Assessments]
+      summary: Update draft assessment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assessment:
+                  $ref: "#/components/schemas/AssessmentInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assessment"
+    delete:
+      tags: [Assessments]
+      summary: Delete draft assessment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+  /assessments/{id}/publish:
+    post:
+      tags: [Assessments]
+      summary: Publish draft assessment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Published
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assessment"
+  /assessments/{id}/archive:
+    post:
+      tags: [Assessments]
+      summary: Archive assessment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Archived
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assessment"
+  /assessments/{assessment_id}/questions:
+    get:
+      tags: [Questions]
+      summary: List questions for an assessment
+      parameters:
+        - name: assessment_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Question list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Question"
+    post:
+      tags: [Questions]
+      summary: Create question on draft assessment
+      parameters:
+        - name: assessment_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  $ref: "#/components/schemas/QuestionInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Question"
+  /questions/{id}:
+    get:
+      tags: [Questions]
+      summary: Show question
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Question
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Question"
+    patch:
+      tags: [Questions]
+      summary: Update question on draft assessment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  $ref: "#/components/schemas/QuestionInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Question"
+    delete:
+      tags: [Questions]
+      summary: Delete question
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+  /invitations:
+    get:
+      tags: [Invitations]
+      summary: List invitations
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Invitation list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invitations:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Invitation"
+                  meta:
+                    $ref: "#/components/schemas/Pagination"
+    post:
+      tags: [Invitations]
+      summary: Invite candidate to published assessment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invitation:
+                  $ref: "#/components/schemas/InvitationInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invitation"
+  /invitations/{id}:
+    get:
+      tags: [Invitations]
+      summary: Show invitation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Invitation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invitation"
+    delete:
+      tags: [Invitations]
+      summary: Delete unused invitation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+  /candidate/session/{token}:
+    get:
+      tags: [Candidate Sessions]
+      security: []
+      summary: Show invitation and current session state
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Candidate access payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invitation:
+                    type: object
+                  assessment:
+                    $ref: "#/components/schemas/Assessment"
+                  session:
+                    $ref: "#/components/schemas/CandidateSession"
+                  attempt_available:
+                    type: boolean
+                  expires_at:
+                    type: string
+                    format: date-time
+  /candidate/session/{token}/start:
+    post:
+      tags: [Candidate Sessions]
+      security: []
+      summary: Start or resume a candidate attempt
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Resumed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateSession"
+        "201":
+          description: Started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateSession"
+        "410":
+          description: Already completed or expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /candidate/session/{token}/autosave:
+    post:
+      tags: [Candidate Sessions]
+      security: []
+      summary: Autosave candidate answers
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                answers:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/AnswerInput"
+      responses:
+        "200":
+          description: Saved or auto-submitted
+  /candidate/session/{token}/submit:
+    post:
+      tags: [Submissions]
+      security: []
+      summary: Idempotent final submit
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                answers:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/AnswerInput"
+      responses:
+        "200":
+          description: Already accepted
+        "202":
+          description: Accepted for asynchronous finalization
+  /dashboard/stats:
+    get:
+      tags: [Recruiter Dashboard]
+      summary: Tenant-scoped dashboard metrics
+      responses:
+        "200":
+          description: Stats payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+  /dashboard/results:
+    get:
+      tags: [Recruiter Dashboard]
+      summary: Elasticsearch-backed candidate result listing
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: assessment_id
+          in: query
+          schema:
+            type: integer
+        - name: pass_fail
+          in: query
+          schema:
+            type: string
+            enum: [pass, fail]
+        - name: completion_status
+          in: query
+          schema:
+            type: string
+            enum: [not_started, in_progress, auto_submitted, submitted, expired]
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [score_desc, score_asc, date_desc]
+      responses:
+        "200":
+          description: Results page
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Result"
+                  meta:
+                    $ref: "#/components/schemas/Pagination"
+                  facets:
+                    type: object
+  /dashboard/results/{id}:
+    get:
+      tags: [Recruiter Dashboard]
+      summary: Show detailed candidate result
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Detailed result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+  /dashboard/results/{id}/manual_review:
+    patch:
+      tags: [Manual Review]
+      summary: Review a free-text answer and re-aggregate result
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ManualReviewInput"
+      responses:
+        "200":
+          description: Updated result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+  /search/candidates:
+    get:
+      tags: [Search]
+      summary: Raw Elasticsearch-backed candidate result search
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: assessment_id
+          in: query
+          schema:
+            type: integer
+        - name: pass_fail
+          in: query
+          schema:
+            type: string
+            enum: [pass, fail]
+        - name: completion_status
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Search response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResponse"
+        "503":
+          description: Search unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
