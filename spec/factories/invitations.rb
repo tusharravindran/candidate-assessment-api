@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :invitation do
-    association :assessment
+    assessment
     organization { assessment.organization }
-    association :recruiter, organization: organization
+    recruiter { assessment.recruiter }
     sequence(:candidate_email) { |n| "candidate#{n}@example.com" }
     sequence(:candidate_name) { |n| "Candidate #{n}" }
     sequence(:token) { |n| "invite-token-#{n}" }

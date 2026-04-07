@@ -23,6 +23,7 @@ module Api
 
         def start
           session = nil
+          created = false
 
           @invitation.with_lock do
             existing_session = @invitation.candidate_session
@@ -39,6 +40,7 @@ module Api
                 ip_address: request.remote_ip,
                 user_agent: request.user_agent
               )
+              created = true
 
               session.start!
               @invitation.mark_used!
@@ -52,7 +54,7 @@ module Api
             }, status: :gone
           end
 
-          status = session.previously_new_record? ? :created : :ok
+          status = created ? :created : :ok
           render json: CandidateSessionSerializer.render_as_hash(session), status: status
         end
 

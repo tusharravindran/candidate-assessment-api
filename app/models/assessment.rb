@@ -20,8 +20,7 @@ class Assessment < ApplicationRecord
     state :archived
 
     event :publish do
-      transitions from: :draft, to: :published
-      guard :has_questions?
+      transitions from: :draft, to: :published, guard: :has_questions?
     end
 
     event :archive do
