@@ -50,11 +50,16 @@ module Api
 
       def publish
         authorize @assessment
-        if @assessment.publish!
-          render json: AssessmentSerializer.render_as_hash(@assessment)
-        else
-          render json: { error: "Cannot publish assessment" }, status: :unprocessable_entity
+        unless @assessment.draft?
+          return render json: { error: "Only draft assessments can be published" }, status: :unprocessable_entity
         end
+
+        unless @assessment.questions.exists?
+          return render json: { error: "Assessment must have at least one question to publish" }, status: :unprocessable_entity
+        end
+
+        @assessment.publish!
+        render json: AssessmentSerializer.render_as_hash(@assessment)
       end
 
       def archive

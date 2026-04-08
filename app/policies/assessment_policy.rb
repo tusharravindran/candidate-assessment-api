@@ -4,7 +4,7 @@ class AssessmentPolicy < ApplicationPolicy
   def create?  = true
   def update?  = same_tenant? && record.editable?
   def destroy? = same_tenant? && record.draft?
-  def publish? = same_tenant? && record.may_publish?
+  def publish? = same_tenant?
   def archive?   = same_tenant? && record.may_archive?
   def unarchive? = same_tenant? && record.may_unarchive?
 
