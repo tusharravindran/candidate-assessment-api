@@ -9,8 +9,9 @@ Rails.application.configure do
   config.log_tags = [:request_id]
   config.cache_store = :redis_cache_store, {
     url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0"),
-    pool_size: ENV.fetch("RAILS_MAX_THREADS", 5).to_i
+    pool: { size: ENV.fetch("RAILS_MAX_THREADS", 5).to_i }
   }
+  config.active_storage.service = :local
   config.active_support.report_deprecations = false
   config.active_record.dump_schema_after_migration = false
   config.force_ssl = false # Render handles SSL termination
