@@ -11,6 +11,7 @@ gem 'devise'
 gem 'devise-jwt'
 gem 'aasm'
 gem 'sidekiq', '~> 7.2'
+gem 'connection_pool', '~> 2.4'  # 3.x changed pop() signature; incompatible with sidekiq 7.3 scheduler
 gem 'pundit'
 gem 'blueprinter'
 gem 'pagy'
