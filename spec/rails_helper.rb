@@ -30,4 +30,8 @@ RSpec.configure do |config|
     clear_performed_jobs
     Current.reset
   end
+
+  config.before(type: :request) do
+    host! "localhost"
+  end
 end

@@ -17,7 +17,6 @@ module Api
             resource.role = "admin"
 
             if resource.save
-              sign_in(resource_name, resource)
               render json: {
                 recruiter: RecruiterSerializer.render_as_hash(resource),
                 message: "Account created successfully"
