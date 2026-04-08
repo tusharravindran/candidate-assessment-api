@@ -18,7 +18,7 @@ gem 'blueprinter'
 gem 'pagy', '~> 8.4'
 gem 'elasticsearch-model', '~> 7.2'
 gem 'elasticsearch-rails', '~> 7.2'
-gem 'elasticsearch', '~> 7.13.0'  # 7.14+ rejects OpenSearch (Bonsai); 7.13.x has no product check
+gem 'elasticsearch', '~> 7.13'  # 7.14+ rejects OpenSearch (Bonsai); 7.13.x has no product check
 gem 'bcrypt', '~> 3.1.7'
 gem 'bootsnap', require: false
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
