@@ -2,6 +2,7 @@ class ApplicationController < ActionController::API
   include Pundit::Authorization
 
   before_action :authenticate_recruiter!
+  before_action :check_organization_active!
   around_action :set_current_context
 
   rescue_from Pundit::NotAuthorizedError, with: :forbidden
@@ -17,6 +18,20 @@ class ApplicationController < ActionController::API
 
   def pundit_user
     current_recruiter
+  end
+
+  # Block all API access if the organization has been suspended by a platform admin.
+  # The JWT may still be valid — we re-check org status on every request so that
+  # suspension takes effect immediately without waiting for token expiry.
+  def check_organization_active!
+    return unless current_recruiter
+
+    unless current_tenant&.active?
+      render json: {
+        error: "Account Suspended",
+        message: "Your organization account has been suspended. Please contact support."
+      }, status: :forbidden
+    end
   end
 
   def forbidden(e = nil)

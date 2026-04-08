@@ -1,4 +1,14 @@
 Rails.application.routes.draw do
+  # Platform admin UI — session-authenticated, not JWT
+  mount RailsAdmin::Engine => "/admin", as: "rails_admin"
+
+  # AdminUser Devise routes (sign_in/sign_out only — no registration from the web)
+  devise_for :admin_users,
+    path: "admin_auth",
+    controllers: { sessions: "admin/sessions" },
+    skip: [:registrations, :passwords]
+
+  # Tenant recruiter JWT auth
   devise_for :recruiters,
     path: "api/v1/auth",
     path_names: {
