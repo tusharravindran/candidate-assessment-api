@@ -5,8 +5,7 @@ services:
     plan: free
     region: oregon
     autoDeployTrigger: commit
-    buildCommand: bundle install && bundle exec bootsnap precompile --gemfile app/ lib/
-    preDeployCommand: bundle exec rails db:migrate
+    buildCommand: bundle install && bundle exec rails db:migrate && bundle exec bootsnap precompile --gemfile app/ lib/
     startCommand: bundle exec puma -C config/puma.rb
     healthCheckPath: /api/v1/health
     envVars:
