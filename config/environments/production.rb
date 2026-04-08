@@ -19,4 +19,7 @@ Rails.application.configure do
   config.x.frontend_url = ENV.fetch("FRONTEND_URL", "https://candidate-assessment-web.vercel.app")
   config.log_formatter = ::Logger::Formatter.new
   config.logger = ActiveSupport::Logger.new($stdout) if ENV["RAILS_LOG_TO_STDOUT"].present?
+
+  # RailsAdmin assets in production (API-only app)
+  config.assets.compile = true
 end

@@ -22,5 +22,8 @@ module CandidateAssessmentApi
                           httponly: true
     config.middleware.use ActionDispatch::Flash
     config.middleware.use Rack::MethodOverride
+
+    # Re-enable assets pipeline for RailsAdmin in an API-only app.
+    config.assets.enabled = true
   end
 end
