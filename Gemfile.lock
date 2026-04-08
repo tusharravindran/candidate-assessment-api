@@ -287,6 +287,8 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
+    redis (5.4.1)
+      redis-client (>= 0.22.0)
     redis-client (0.28.0)
       connection_pool
     reline (0.6.3)
@@ -384,6 +386,7 @@ DEPENDENCIES
   rack-cors
   rails (~> 7.1.0)
   rails_admin (~> 3.1)
+  redis (>= 4.0.1)
   rspec-rails
   sassc-rails
   sidekiq (~> 7.2)
