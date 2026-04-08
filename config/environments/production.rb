@@ -15,7 +15,9 @@ Rails.application.configure do
   config.active_support.report_deprecations = false
   config.active_record.dump_schema_after_migration = false
   config.force_ssl = false # Render handles SSL termination
-  config.active_job.queue_adapter = :sidekiq
+  # Use inline adapter when no Sidekiq worker is deployed (free tier).
+  # Set SIDEKIQ_WORKER=true on Render when the worker service is running.
+  config.active_job.queue_adapter = ENV["SIDEKIQ_WORKER"] == "true" ? :sidekiq : :inline
   config.x.frontend_url = ENV.fetch("FRONTEND_URL", "https://candidate-assessment-web.vercel.app")
   config.log_formatter = ::Logger::Formatter.new
   config.logger = ActiveSupport::Logger.new($stdout) if ENV["RAILS_LOG_TO_STDOUT"].present?
