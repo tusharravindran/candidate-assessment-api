@@ -29,6 +29,7 @@ Rails.application.routes.draw do
         member do
           post :publish
           post :archive
+          post :unarchive
         end
         resources :questions, shallow: true
       end

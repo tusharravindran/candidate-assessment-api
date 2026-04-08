@@ -3,7 +3,7 @@ module Api
     class AssessmentsController < ApplicationController
       include Pagy::Backend
 
-      before_action :set_assessment, only: [:show, :update, :destroy, :publish, :archive]
+      before_action :set_assessment, only: [:show, :update, :destroy, :publish, :archive, :unarchive]
 
       def index
         assessments = policy_scope(Assessment)
@@ -60,6 +60,12 @@ module Api
       def archive
         authorize @assessment
         @assessment.archive!
+        render json: AssessmentSerializer.render_as_hash(@assessment)
+      end
+
+      def unarchive
+        authorize @assessment
+        @assessment.unarchive!
         render json: AssessmentSerializer.render_as_hash(@assessment)
       end
 

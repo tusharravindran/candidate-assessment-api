@@ -5,7 +5,8 @@ class AssessmentPolicy < ApplicationPolicy
   def update?  = same_tenant? && record.editable?
   def destroy? = same_tenant? && record.draft?
   def publish? = same_tenant? && record.may_publish?
-  def archive? = same_tenant? && record.may_archive?
+  def archive?   = same_tenant? && record.may_archive?
+  def unarchive? = same_tenant? && record.may_unarchive?
 
   class Scope < Scope
     def resolve

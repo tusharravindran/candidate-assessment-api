@@ -8,6 +8,22 @@ class InvitationSerializer < Blueprinter::Base
     "#{frontend_origin}/candidate/#{invitation.token}"
   end
 
+  field :session_status do |invitation|
+    invitation.candidate_session&.status || "not_started"
+  end
+
+  field :result_id do |invitation|
+    invitation.candidate_session&.result&.id
+  end
+
+  field :score_percentage do |invitation|
+    invitation.candidate_session&.result&.percentage
+  end
+
+  field :passed do |invitation|
+    invitation.candidate_session&.result&.passed
+  end
+
   view :candidate do
     fields :candidate_email, :candidate_name, :expires_at
   end

@@ -26,6 +26,10 @@ class Assessment < ApplicationRecord
     event :archive do
       transitions from: [:draft, :published], to: :archived
     end
+
+    event :unarchive do
+      transitions from: :archived, to: :draft
+    end
   end
 
   validate :recruiter_belongs_to_organization

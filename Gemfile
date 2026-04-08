@@ -14,7 +14,7 @@ gem 'sidekiq', '~> 7.2'
 gem 'connection_pool', '~> 2.4'  # 3.x changed pop() signature; incompatible with sidekiq 7.3 scheduler
 gem 'pundit'
 gem 'blueprinter'
-gem 'pagy'
+gem 'pagy', '~> 8.4'
 gem 'elasticsearch-model', '~> 7.2'
 gem 'elasticsearch-rails', '~> 7.2'
 gem 'elasticsearch', '~> 7.13'

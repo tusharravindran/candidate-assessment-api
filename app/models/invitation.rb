@@ -17,6 +17,7 @@ class Invitation < ApplicationRecord
   validate :assessment_belongs_to_organization
   validate :recruiter_belongs_to_organization
   validate :assessment_must_be_published
+  validate :no_duplicate_invitation, on: :create
 
   def expired?
     expires_at < Time.current
@@ -58,5 +59,16 @@ class Invitation < ApplicationRecord
     return if assessment.blank? || assessment.published?
 
     errors.add(:assessment, "must be published before sending invitations")
+  end
+
+  def no_duplicate_invitation
+    return if candidate_email.blank? || assessment_id.blank? || organization_id.blank?
+
+    already_invited = Invitation.where(
+      organization_id: organization_id,
+      assessment_id: assessment_id
+    ).where("LOWER(candidate_email) = ?", candidate_email.downcase).exists?
+
+    errors.add(:candidate_email, "has already been invited to this assessment") if already_invited
   end
 end

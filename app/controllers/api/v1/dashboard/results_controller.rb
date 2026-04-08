@@ -87,7 +87,7 @@ module Api
             )
           end
 
-          pagy, records = pagy(scope, items: params[:per_page] || 20)
+          pagy, records = pagy(scope, limit: params[:per_page] || 20)
 
           {
             results: ResultSerializer.render_as_hash(records, view: :with_details),

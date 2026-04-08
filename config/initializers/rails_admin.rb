@@ -61,42 +61,16 @@ RailsAdmin.config do |config|
       field :domain do
         help "Optional. Used for domain-based tenant identification."
       end
-      field :plan do
-        partial "plan_select"
+      field :plan, :enum do
+        enum { Organization::PLANS }
         help "Subscription plan. Changing this affects feature gating."
       end
       field :active do
         help "Uncheck to suspend the organization. All recruiter logins will be blocked immediately."
       end
-      field :settings, :json_editor
+      field :settings, :text
     end
 
-    # Custom bulk actions
-    action :activate_organization do
-      action_name :activate
-      only Organization
-      http_methods [:post]
-      controller do
-        proc do
-          @objects.each { |org| org.update!(active: true) }
-          flash[:success] = "#{@objects.size} organization(s) activated."
-          redirect_to back_or_index
-        end
-      end
-    end
-
-    action :suspend_organization do
-      action_name :suspend
-      only Organization
-      http_methods [:post]
-      controller do
-        proc do
-          @objects.each { |org| org.update!(active: false) }
-          flash[:success] = "#{@objects.size} organization(s) suspended."
-          redirect_to back_or_index
-        end
-      end
-    end
   end
 
   # ── Recruiter (tenant user) ──────────────────────────────────────────────────
@@ -174,12 +148,15 @@ RailsAdmin.config do |config|
     end
 
     edit do
-      # Assessments are intentionally read-only in platform admin.
-      # Mutations happen inside the recruiter workspace.
-      read_only do
-        field :title
-        field :status
-        field :organization
+      field :title do
+        read_only true
+        help "Managed by recruiters — read only in platform admin."
+      end
+      field :status do
+        read_only true
+      end
+      field :organization do
+        read_only true
       end
     end
   end

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin · Candidate Assessment Platform</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #f1f5f9;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        padding: 48px 40px;
+        width: 100%;
+        max-width: 400px;
+      }
+      .logo {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+      .logo h1 { font-size: 22px; font-weight: 700; color: #1e293b; }
+      .logo p  { font-size: 13px; color: #64748b; margin-top: 4px; }
+      .alert {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        border-radius: 6px;
+        padding: 10px 14px;
+        font-size: 13px;
+        margin-bottom: 20px;
+      }
+      .notice {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #16a34a;
+        border-radius: 6px;
+        padding: 10px 14px;
+        font-size: 13px;
+        margin-bottom: 20px;
+      }
+      label { display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px; }
+      input[type="email"], input[type="password"] {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #1e293b;
+        outline: none;
+        transition: border-color 0.15s;
+        margin-bottom: 16px;
+      }
+      input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+      button[type="submit"] {
+        width: 100%;
+        padding: 11px;
+        background: #6366f1;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      button[type="submit"]:hover { background: #4f46e5; }
+    </style>
+  </head>
+  <body>
+    <%= yield %>
+  </body>
+</html>

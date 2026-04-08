@@ -5,7 +5,10 @@ module Api
       before_action :set_invitation, only: [:show, :destroy]
 
       def index
-        invitations = policy_scope(Invitation).includes(:assessment).order(created_at: :desc)
+        invitations = policy_scope(Invitation)
+          .includes(:assessment, candidate_session: :result)
+          .order(created_at: :desc)
+        invitations = invitations.where(assessment_id: params[:assessment_id]) if params[:assessment_id].present?
         pagy, invitations = pagy(invitations)
         render json: {
           invitations: InvitationSerializer.render_as_hash(invitations),
