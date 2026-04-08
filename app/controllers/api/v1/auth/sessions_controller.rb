@@ -7,6 +7,10 @@ module Api
 
         def create
           self.resource = warden.authenticate!(auth_options)
+          unless resource&.persisted?
+            return render json: { error: "Invalid credentials" }, status: :unauthorized
+          end
+
           sign_in(resource_name, resource, store: false)
 
           render json: {
@@ -23,6 +27,10 @@ module Api
         private
 
         def respond_with(resource, _opts = {})
+          unless resource&.persisted?
+            return render json: { error: "Invalid credentials" }, status: :unauthorized
+          end
+
           render json: {
             recruiter: RecruiterSerializer.render_as_hash(resource),
             message: "Logged in successfully"
