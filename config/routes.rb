@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  # Top-level health check — no DB, no auth, responds immediately for Render deploy probe
+  get "/health", to: proc { [200, { "Content-Type" => "application/json" }, ['{"status":"ok"}']] }
+
   # Platform admin UI — session-authenticated, not JWT
   mount RailsAdmin::Engine => "/admin", as: "rails_admin"
 
