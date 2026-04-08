@@ -15,6 +15,7 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
   config.force_ssl = false # Render handles SSL termination
   config.active_job.queue_adapter = :sidekiq
+  config.x.frontend_url = ENV.fetch("FRONTEND_URL", "https://candidate-assessment-web.vercel.app")
   config.log_formatter = ::Logger::Formatter.new
   config.logger = ActiveSupport::Logger.new($stdout) if ENV["RAILS_LOG_TO_STDOUT"].present?
 end

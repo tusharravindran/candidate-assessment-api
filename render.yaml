@@ -21,7 +21,7 @@ services:
       - key: SIDEKIQ_CONCURRENCY
         value: "2"
       - key: FRONTEND_URL
-        value: https://candidate-assessment-web.onrender.com
+        value: https://candidate-assessment-web.vercel.app
       - key: SECRET_KEY_BASE
         generateValue: true
       - key: DEVISE_JWT_SECRET_KEY
@@ -31,10 +31,7 @@ services:
           name: candidate-assessment-postgres
           property: connectionString
       - key: REDIS_URL
-        fromService:
-          type: keyvalue
-          name: candidate-assessment-redis
-          property: connectionString
+        sync: false
       - key: ELASTICSEARCH_URL
         sync: false
 
@@ -68,19 +65,9 @@ services:
           name: candidate-assessment-postgres
           property: connectionString
       - key: REDIS_URL
-        fromService:
-          type: keyvalue
-          name: candidate-assessment-redis
-          property: connectionString
+        sync: false
       - key: ELASTICSEARCH_URL
         sync: false
-
-  - type: keyvalue
-    name: candidate-assessment-redis
-    plan: free
-    region: oregon
-    ipAllowList: []
-    maxmemoryPolicy: allkeys-lru
 
 databases:
   - name: candidate-assessment-postgres
