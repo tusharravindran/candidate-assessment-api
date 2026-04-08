@@ -33,6 +33,8 @@ services:
         sync: false
       - key: ELASTICSEARCH_URL
         sync: false
+      - key: ELASTICSEARCH_SKIP_PRODUCT_CHECK
+        value: "true"
 
   - type: worker
     runtime: ruby
@@ -67,6 +69,8 @@ services:
         sync: false
       - key: ELASTICSEARCH_URL
         sync: false
+      - key: ELASTICSEARCH_SKIP_PRODUCT_CHECK
+        value: "true"
 
 databases:
   - name: candidate-assessment-postgres
