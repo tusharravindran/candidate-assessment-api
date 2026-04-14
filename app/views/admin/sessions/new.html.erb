@@ -12,7 +12,7 @@
     <div class="notice"><%= flash[:notice] %></div>
   <% end %>
 
-  <%= form_with model: @admin_user, url: admin_user_session_path, method: :post do |f| %>
+  <%= form_with model: @admin_user, url: admin_signin_path, method: :post do |f| %>
     <%= f.label :email, "Email" %>
     <%= f.email_field :email, autocomplete: "email", autofocus: true %>
 

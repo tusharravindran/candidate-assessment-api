@@ -6,6 +6,14 @@ class Admin::SessionsController < ActionController::Base
 
   before_action :redirect_if_signed_in, only: [:new, :create]
 
+  def entry
+    if warden.authenticated?(:admin_user)
+      redirect_to rails_admin.dashboard_path
+    else
+      redirect_to admin_signin_path
+    end
+  end
+
   def new
     @admin_user = AdminUser.new
   end
@@ -25,7 +33,7 @@ class Admin::SessionsController < ActionController::Base
 
   def destroy
     sign_out(:admin_user)
-    redirect_to new_admin_user_session_path, notice: "Signed out successfully."
+    redirect_to admin_signin_path, notice: "Signed out successfully."
   end
 
   private
