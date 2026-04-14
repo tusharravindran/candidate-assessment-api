@@ -2,6 +2,10 @@ Rails.application.routes.draw do
   # Top-level health check — no DB, no auth, responds immediately for Render deploy probe
   get "/health", to: proc { [200, { "Content-Type" => "application/json" }, ['{"status":"ok"}']] }
 
+  # Redirect legacy/admin-typed login URLs before the RailsAdmin engine catches them.
+  get "/admin/sign_in", to: redirect("/admin_auth/sign_in")
+  get "/admin/signin", to: redirect("/admin_auth/sign_in")
+
   # Platform admin UI — session-authenticated, not JWT
   mount RailsAdmin::Engine => "/admin", as: "rails_admin"
 
